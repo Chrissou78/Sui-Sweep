@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useSignAndExecuteTransaction } from '@mysten/dapp-kit';
 import { Transaction } from '@mysten/sui/transactions';
-import type { NFTItem } from '../types';
 
 const BURN_ADDRESS = '0x0000000000000000000000000000000000000000000000000000000000000000';
 
@@ -9,15 +8,12 @@ interface SelectionToolbarProps {
   selectedIds: Set<string>;
   onClear: () => void;
   onBurnComplete: (burnedIds: string[]) => void;
-  nfts: NFTItem[];
 }
 
 export function SelectionToolbar({
   selectedIds,
   onClear,
   onBurnComplete,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  // nfts,
 }: SelectionToolbarProps) {
   const [isBurning, setIsBurning] = useState(false);
   const [burnProgress, setBurnProgress] = useState({ current: 0, total: 0 });
@@ -30,7 +26,7 @@ export function SelectionToolbar({
     if (selectedCount === 0) return;
     
     const confirmed = window.confirm(
-      `Are you sure you want to burn ${selectedCount} NFT${selectedCount > 1 ? 's' : ''}? This action cannot be undone.`
+      `Burn ${selectedCount} item${selectedCount > 1 ? 's' : ''} permanently?`
     );
     
     if (!confirmed) return;
@@ -72,67 +68,72 @@ export function SelectionToolbar({
       right: '0',
       background: 'linear-gradient(180deg, rgba(13, 21, 38, 0.95) 0%, rgba(10, 15, 26, 0.98) 100%)',
       borderTop: '1px solid rgba(0, 212, 212, 0.3)',
-      padding: '16px 40px',
+      padding: '12px 16px',
+      paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))',
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
+      gap: '12px',
       backdropFilter: 'blur(10px)',
       zIndex: 1000,
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: '12px',
+        flex: 1,
+        minWidth: 0,
+      }}>
         <span style={{ 
           color: '#00d4d4', 
           fontWeight: '600',
-          fontSize: '16px',
+          fontSize: '14px',
+          whiteSpace: 'nowrap',
         }}>
-          {selectedCount} NFT{selectedCount !== 1 ? 's' : ''} selected
+          {selectedCount} selected
         </span>
         <button
           onClick={onClear}
           style={{
-            padding: '8px 16px',
+            padding: '8px 12px',
             borderRadius: '8px',
             border: '1px solid rgba(148, 163, 184, 0.3)',
             background: 'transparent',
             color: '#94a3b8',
             cursor: 'pointer',
-            fontSize: '14px',
+            fontSize: '13px',
+            minHeight: '40px',
+            whiteSpace: 'nowrap',
           }}
         >
-          Clear Selection
+          Clear
         </button>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-        {isBurning && (
-          <span style={{ color: '#f97316', fontSize: '14px' }}>
-            Burning {burnProgress.current}/{burnProgress.total}...
-          </span>
-        )}
-        <button
-          onClick={handleBulkBurn}
-          disabled={isBurning || selectedCount === 0}
-          style={{
-            padding: '12px 28px',
-            borderRadius: '10px',
-            border: 'none',
-            background: isBurning 
-              ? 'rgba(249, 115, 22, 0.3)' 
-              : 'linear-gradient(135deg, #f97316, #dc2626)',
-            color: '#ffffff',
-            cursor: isBurning ? 'not-allowed' : 'pointer',
-            fontSize: '15px',
-            fontWeight: '600',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            boxShadow: isBurning ? 'none' : '0 4px 15px rgba(249, 115, 22, 0.3)',
-            transition: 'all 0.2s ease',
-          }}
-        >
-          🔥 {isBurning ? 'Burning...' : `Burn ${selectedCount} NFT${selectedCount !== 1 ? 's' : ''}`}
-        </button>
-      </div>
+      <button
+        onClick={handleBulkBurn}
+        disabled={isBurning || selectedCount === 0}
+        style={{
+          padding: '12px 20px',
+          borderRadius: '10px',
+          border: 'none',
+          background: isBurning 
+            ? 'rgba(249, 115, 22, 0.3)' 
+            : 'linear-gradient(135deg, #f97316, #dc2626)',
+          color: '#ffffff',
+          cursor: isBurning ? 'not-allowed' : 'pointer',
+          fontSize: '14px',
+          fontWeight: '600',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          boxShadow: isBurning ? 'none' : '0 4px 15px rgba(249, 115, 22, 0.3)',
+          minHeight: '48px',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        🔥 {isBurning ? `${burnProgress.current}/${burnProgress.total}` : 'Burn'}
+      </button>
     </div>
   );
 }

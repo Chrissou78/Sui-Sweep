@@ -1,6 +1,5 @@
 import { useCurrentAccount, useSuiClientQuery } from '@mysten/dapp-kit';
-import { useMemo } from 'react';
-import { NFTItem } from '../types';
+import type { NFTItem } from '../types';
 import { isNFTHidden } from '../lib/storage';
 
 export function useWalletNFTs() {
@@ -10,9 +9,6 @@ export function useWalletNFTs() {
     'getOwnedObjects',
     {
       owner: account?.address || '',
-      filter: {
-        MatchNone: [{ StructType: '0x2::coin::Coin' }],
-      },
       options: {
         showContent: true,
         showDisplay: true,
@@ -24,49 +20,54 @@ export function useWalletNFTs() {
     }
   );
 
-  const nfts: NFTItem[] = useMemo(() => {
-    if (!data?.data) return [];
+  // Log for debugging
+  if (error) {
+    console.error('[useWalletNFTs] Error:', error);
+  }
 
-    return data.data
-      .filter(obj => obj.data)
-      .map(obj => {
-        const objectId = obj.data!.objectId;
-        const type = obj.data!.type || 'Unknown';
-        const packageId = type.split('::')[0];
-        
-        const display = obj.data!.display?.data;
-        const content = obj.data!.content;
-        
-        let name = 'Unnamed NFT';
-        let description = '';
-        let imageUrl = '';
+  // Filter out coins and map to NFTItem
+  const nfts: NFTItem[] = (data?.data || [])
+    .filter((obj) => {
+      const type = obj.data?.type || '';
+      // Exclude coin types
+      return !type.includes('::coin::') && !type.includes('0x2::coin::');
+    })
+    .map((obj) => {
+      const content = obj.data?.content;
+      const display = obj.data?.display?.data;
+      const type = obj.data?.type || '';
+      
+      // Extract package ID from type
+      const packageId = type.split('::')[0] || '';
 
-        if (display) {
-          name = display.name || name;
-          description = display.description || '';
-          imageUrl = display.image_url || '';
-        }
+      // Get name and description from display or content
+      let name = display?.name || '';
+      let description = display?.description || '';
+      let imageUrl = display?.image_url || '';
 
-        if (content && 'fields' in content) {
-          const fields = content.fields as Record<string, unknown>;
-          name = (fields.name as string) || name;
-          description = (fields.description as string) || description;
-          imageUrl = (fields.url as string) || (fields.image_url as string) || imageUrl;
-        }
+      // Try to get from content if display is empty
+      if (content && 'fields' in content) {
+        const fields = content.fields as Record<string, unknown>;
+        if (!name && fields.name) name = String(fields.name);
+        if (!description && fields.description) description = String(fields.description);
+        if (!imageUrl && fields.image_url) imageUrl = String(fields.image_url);
+        if (!imageUrl && fields.url) imageUrl = String(fields.url);
+      }
 
-        return {
-          objectId,
-          type,
-          packageId,
-          name,
-          description,
-          imageUrl,
-          classification: null,
-          isHidden: isNFTHidden(objectId),
-          isSelected: false,
-        };
-      });
-  }, [data]);
+      return {
+        objectId: obj.data?.objectId || '',
+        type,
+        packageId,
+        name,
+        description,
+        imageUrl,
+        classification: null,
+        isHidden: isNFTHidden(obj.data?.objectId || ''),
+        isSelected: false,
+      };
+    });
+
+  console.log('[useWalletNFTs] Loaded:', nfts.length, 'NFTs');
 
   return {
     nfts,

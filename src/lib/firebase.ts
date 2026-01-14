@@ -12,40 +12,48 @@ const firebaseConfig = {
   measurementId: "G-8TXL7DYHPR"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 
-// Stats reference
 const statsRef = ref(database, 'stats');
-//const walletsRef = ref(database, 'wallets');
 
 export interface GlobalStats {
   walletsConnected: number;
+  // NFT stats
   nftsScanned: number;
-  legitFound: number;
-  dubiousFound: number;
-  scamsFound: number;
+  nftLegitFound: number;
+  nftDubiousFound: number;
+  nftScamsFound: number;
   nftsBurned: number;
+  // Token stats
+  tokensScanned: number;
+  tokenLegitFound: number;
+  tokenDubiousFound: number;
+  tokenScamsFound: number;
+  tokensBurned: number;
 }
 
 const DEFAULT_STATS: GlobalStats = {
   walletsConnected: 1,
   nftsScanned: 3,
-  legitFound: 1,
-  dubiousFound: 1,
-  scamsFound: 1,
+  nftLegitFound: 1,
+  nftDubiousFound: 1,
+  nftScamsFound: 1,
   nftsBurned: 1,
+  tokensScanned: 5,
+  tokenLegitFound: 3,
+  tokenDubiousFound: 1,
+  tokenScamsFound: 1,
+  tokensBurned: 0,
 };
 
-// Get current global stats
 export async function getGlobalStats(): Promise<GlobalStats> {
   try {
     const snapshot = await get(statsRef);
     if (snapshot.exists()) {
-      return snapshot.val() as GlobalStats;
+      // Merge with defaults to handle missing fields
+      return { ...DEFAULT_STATS, ...snapshot.val() };
     }
-    // Initialize with defaults if no data
     await set(statsRef, DEFAULT_STATS);
     return DEFAULT_STATS;
   } catch (error) {
@@ -54,7 +62,6 @@ export async function getGlobalStats(): Promise<GlobalStats> {
   }
 }
 
-// Check if wallet has been tracked before
 async function isWalletTracked(walletAddress: string): Promise<boolean> {
   try {
     const walletRef = ref(database, `wallets/${walletAddress.toLowerCase().replace(/\./g, '_')}`);
@@ -66,13 +73,11 @@ async function isWalletTracked(walletAddress: string): Promise<boolean> {
   }
 }
 
-// Mark wallet as tracked
-async function markWalletTracked(walletAddress: string, nftCount: number): Promise<void> {
+async function markWalletTracked(walletAddress: string): Promise<void> {
   try {
     const walletRef = ref(database, `wallets/${walletAddress.toLowerCase().replace(/\./g, '_')}`);
     await set(walletRef, {
       address: walletAddress,
-      nftCount,
       trackedAt: new Date().toISOString()
     });
   } catch (error) {
@@ -80,7 +85,6 @@ async function markWalletTracked(walletAddress: string, nftCount: number): Promi
   }
 }
 
-// Track wallet connection (only if new)
 export async function trackWalletConnection(walletAddress: string): Promise<boolean> {
   const alreadyTracked = await isWalletTracked(walletAddress);
   if (alreadyTracked) {
@@ -95,6 +99,7 @@ export async function trackWalletConnection(walletAddress: string): Promise<bool
       }
       return currentStats;
     });
+    await markWalletTracked(walletAddress);
     console.log('[SUI Sweep] New wallet tracked globally');
     return true;
   } catch (error) {
@@ -103,7 +108,7 @@ export async function trackWalletConnection(walletAddress: string): Promise<bool
   }
 }
 
-// Track NFT scan (only once per wallet globally)
+// Track NFT scan
 export async function trackNFTScan(
   walletAddress: string,
   totalNFTs: number,
@@ -111,9 +116,10 @@ export async function trackNFTScan(
   dubious: number,
   scam: number
 ): Promise<boolean> {
-  const alreadyTracked = await isWalletTracked(walletAddress);
-  if (alreadyTracked) {
-    console.log('[SUI Sweep] Wallet scan already tracked globally');
+  const sessionKey = `sui-sweep-nft-scanned-${walletAddress.toLowerCase()}`;
+  
+  if (sessionStorage.getItem(sessionKey)) {
+    console.log('[SUI Sweep] NFT scan already tracked this session');
     return false;
   }
 
@@ -121,25 +127,58 @@ export async function trackNFTScan(
     await runTransaction(statsRef, (currentStats) => {
       if (currentStats) {
         currentStats.nftsScanned = (currentStats.nftsScanned || 0) + totalNFTs;
-        currentStats.legitFound = (currentStats.legitFound || 0) + legit;
-        currentStats.dubiousFound = (currentStats.dubiousFound || 0) + dubious;
-        currentStats.scamsFound = (currentStats.scamsFound || 0) + scam;
+        currentStats.nftLegitFound = (currentStats.nftLegitFound || 0) + legit;
+        currentStats.nftDubiousFound = (currentStats.nftDubiousFound || 0) + dubious;
+        currentStats.nftScamsFound = (currentStats.nftScamsFound || 0) + scam;
       }
       return currentStats;
     });
 
-    // Mark this wallet as tracked
-    await markWalletTracked(walletAddress, totalNFTs);
-    
-    console.log(`[SUI Sweep] Scan tracked globally: +${totalNFTs} NFTs`);
+    sessionStorage.setItem(sessionKey, 'true');
+    console.log(`[SUI Sweep] NFT scan tracked: +${totalNFTs} NFTs`);
     return true;
   } catch (error) {
-    console.error('[SUI Sweep] Error tracking scan:', error);
+    console.error('[SUI Sweep] Error tracking NFT scan:', error);
     return false;
   }
 }
 
-// Track NFT burn (always increment)
+// Track Token scan
+export async function trackTokenScan(
+  walletAddress: string,
+  totalTokens: number,
+  legit: number,
+  dubious: number,
+  scam: number
+): Promise<boolean> {
+  const sessionKey = `sui-sweep-token-scanned-${walletAddress.toLowerCase()}`;
+  
+  if (sessionStorage.getItem(sessionKey)) {
+    console.log('[SUI Sweep] Token scan already tracked this session');
+    return false;
+  }
+
+  try {
+    await runTransaction(statsRef, (currentStats) => {
+      if (currentStats) {
+        currentStats.tokensScanned = (currentStats.tokensScanned || 0) + totalTokens;
+        currentStats.tokenLegitFound = (currentStats.tokenLegitFound || 0) + legit;
+        currentStats.tokenDubiousFound = (currentStats.tokenDubiousFound || 0) + dubious;
+        currentStats.tokenScamsFound = (currentStats.tokenScamsFound || 0) + scam;
+      }
+      return currentStats;
+    });
+
+    sessionStorage.setItem(sessionKey, 'true');
+    console.log(`[SUI Sweep] Token scan tracked: +${totalTokens} tokens`);
+    return true;
+  } catch (error) {
+    console.error('[SUI Sweep] Error tracking token scan:', error);
+    return false;
+  }
+}
+
+// Track NFT burn
 export async function trackNFTBurn(count: number = 1): Promise<void> {
   try {
     await runTransaction(statsRef, (currentStats) => {
@@ -148,13 +187,27 @@ export async function trackNFTBurn(count: number = 1): Promise<void> {
       }
       return currentStats;
     });
-    console.log(`[SUI Sweep] Burn tracked globally: +${count}`);
+    console.log(`[SUI Sweep] NFT burn tracked: +${count}`);
   } catch (error) {
-    console.error('[SUI Sweep] Error tracking burn:', error);
+    console.error('[SUI Sweep] Error tracking NFT burn:', error);
   }
 }
 
-// Initialize stats if they don't exist
+// Track Token burn
+export async function trackTokenBurn(count: number = 1): Promise<void> {
+  try {
+    await runTransaction(statsRef, (currentStats) => {
+      if (currentStats) {
+        currentStats.tokensBurned = (currentStats.tokensBurned || 0) + count;
+      }
+      return currentStats;
+    });
+    console.log(`[SUI Sweep] Token burn tracked: +${count}`);
+  } catch (error) {
+    console.error('[SUI Sweep] Error tracking token burn:', error);
+  }
+}
+
 export async function initializeStats(): Promise<void> {
   try {
     const snapshot = await get(statsRef);
