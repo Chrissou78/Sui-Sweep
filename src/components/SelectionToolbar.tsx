@@ -16,7 +16,8 @@ export function SelectionToolbar({
   selectedIds,
   onClear,
   onBurnComplete,
-  nfts,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // nfts,
 }: SelectionToolbarProps) {
   const [isBurning, setIsBurning] = useState(false);
   const [burnProgress, setBurnProgress] = useState({ current: 0, total: 0 });

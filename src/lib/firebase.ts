@@ -18,7 +18,7 @@ const database = getDatabase(app);
 
 // Stats reference
 const statsRef = ref(database, 'stats');
-const walletsRef = ref(database, 'wallets');
+//const walletsRef = ref(database, 'wallets');
 
 export interface GlobalStats {
   walletsConnected: number;

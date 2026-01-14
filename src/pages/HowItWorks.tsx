@@ -67,7 +67,7 @@ export function HowItWorks() {
       </p>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        {steps.map((step, index) => (
+        {steps.map((step) => (
           <div
             key={step.number}
             style={{
