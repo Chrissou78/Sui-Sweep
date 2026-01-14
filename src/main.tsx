@@ -2,17 +2,17 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SuiClientProvider, WalletProvider } from '@mysten/dapp-kit';
-import { getFullnodeUrl } from '@mysten/sui/client';
 import App from './App';
 import './index.css';
 import '@mysten/dapp-kit/dist/index.css';
 
 const queryClient = new QueryClient();
 
+// Use alternative RPC endpoints that support CORS
 const networks = {
-  mainnet: { url: getFullnodeUrl('mainnet') },
-  testnet: { url: getFullnodeUrl('testnet') },
-  devnet: { url: getFullnodeUrl('devnet') },
+  mainnet: { url: 'https://mainnet.suiet.app' },
+  testnet: { url: 'https://testnet.suiet.app' },
+  devnet: { url: 'https://devnet.suiet.app' },
 };
 
 // Custom dark theme for dApp Kit
