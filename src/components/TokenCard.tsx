@@ -125,50 +125,12 @@ export function TokenCard({
         </div>
       )}
 
-      {/* Status Badge */}
-      {classification && !token.isHidden && (
-        <div style={{
-          position: 'absolute',
-          top: '12px',
-          right: '12px',
-          zIndex: 10,
-          background: `${statusColor}30`,
-          border: `1px solid ${statusColor}50`,
-          padding: '4px 8px',
-          borderRadius: '6px',
-          fontSize: '10px',
-          color: statusColor,
-          fontWeight: '600',
-          textTransform: 'uppercase',
-        }}>
-          {statusLabel}
-        </div>
-      )}
-
-      {/* Hidden Badge */}
-      {token.isHidden && (
-        <div style={{
-          position: 'absolute',
-          top: '12px',
-          right: '12px',
-          zIndex: 10,
-          background: 'rgba(0, 0, 0, 0.7)',
-          padding: '4px 8px',
-          borderRadius: '6px',
-          fontSize: '10px',
-          color: '#94a3b8',
-          fontWeight: '500',
-        }}>
-          HIDDEN
-        </div>
-      )}
-
       {/* Token Icon & Symbol */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
         gap: '12px',
-        marginBottom: '12px',
+        marginBottom: '8px',
         marginTop: selectionMode ? '24px' : '0',
       }}>
         <div style={{
@@ -179,11 +141,12 @@ export function TokenCard({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: '20px',
+          fontSize: '18px',
           fontWeight: '700',
           color: '#00d4d4',
           border: '2px solid rgba(0, 212, 212, 0.2)',
           opacity: token.isHidden ? 0.4 : 1,
+          flexShrink: 0,
         }}>
           {token.iconUrl ? (
             <img 
@@ -222,6 +185,37 @@ export function TokenCard({
         </div>
       </div>
 
+      {/* Status Badge - On its own line */}
+      <div style={{ marginBottom: '12px' }}>
+        {token.isHidden ? (
+          <span style={{
+            display: 'inline-block',
+            background: 'rgba(0, 0, 0, 0.5)',
+            padding: '4px 10px',
+            borderRadius: '6px',
+            fontSize: '11px',
+            color: '#94a3b8',
+            fontWeight: '500',
+          }}>
+            HIDDEN
+          </span>
+        ) : classification && (
+          <span style={{
+            display: 'inline-block',
+            background: `${statusColor}20`,
+            border: `1px solid ${statusColor}40`,
+            padding: '4px 10px',
+            borderRadius: '6px',
+            fontSize: '11px',
+            color: statusColor,
+            fontWeight: '600',
+            textTransform: 'uppercase',
+          }}>
+            {statusLabel}
+          </span>
+        )}
+      </div>
+
       {/* Balance */}
       <div style={{
         background: 'rgba(0, 0, 0, 0.2)',
@@ -254,9 +248,9 @@ export function TokenCard({
       {classification && (
         <p style={{
           fontSize: '11px',
-          color: statusColor,
+          color: '#94a3b8',
           marginBottom: '12px',
-          opacity: 0.8,
+          lineHeight: '1.4',
         }}>
           {classification.reason}
         </p>
