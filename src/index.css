@@ -1,0 +1,266 @@
+@import "tailwindcss";
+
+/* ============================================
+   SUI SWEEP - Global Styles
+   ============================================ */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #0a0f1a 0%, #0d1a2d 50%, #0a0f1a 100%);
+  min-height: 100vh;
+  color: #e2e8f0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #1a2332;
+}
+::-webkit-scrollbar-thumb {
+  background: #00d4d4;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #00b8b8;
+}
+
+/* ============================================
+   Sui dApp Kit - FORCE Dark Theme
+   ============================================ */
+
+/* Target ALL possible modal/dialog elements */
+[data-radix-portal],
+[data-radix-portal] *,
+[role="dialog"],
+[role="dialog"] *,
+[aria-modal="true"],
+[aria-modal="true"] * {
+  --background: #0d1526 !important;
+  --foreground: #e2e8f0 !important;
+}
+
+/* Modal overlay - dark backdrop */
+[data-radix-dialog-overlay],
+[data-radix-portal] > div:first-child,
+.fixed.inset-0,
+[class*="Overlay"] {
+  background: rgba(0, 0, 0, 0.85) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+/* Modal container - dark background */
+[data-radix-dialog-content],
+[role="dialog"],
+[aria-modal="true"],
+[class*="DialogContent"],
+[class*="Modal"],
+[class*="modal"] {
+  background: #0d1526 !important;
+  background-color: #0d1526 !important;
+  border: 1px solid rgba(0, 212, 212, 0.3) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 0 40px rgba(0, 212, 212, 0.15), 0 20px 40px rgba(0, 0, 0, 0.5) !important;
+  color: #e2e8f0 !important;
+}
+
+/* Force ALL divs inside modal to be dark */
+[data-radix-dialog-content] div,
+[role="dialog"] div,
+[aria-modal="true"] div {
+  background-color: transparent !important;
+}
+
+/* Specific panels that might have white background */
+[data-radix-dialog-content] > div,
+[data-radix-dialog-content] > div > div,
+[data-radix-dialog-content] [class*="container"],
+[data-radix-dialog-content] [class*="wrapper"],
+[data-radix-dialog-content] [class*="content"],
+[data-radix-dialog-content] [class*="panel"],
+[data-radix-dialog-content] [class*="body"],
+[data-radix-dialog-content] [class*="inner"] {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* Left side panel fix */
+[data-radix-dialog-content] > div:first-child,
+[data-radix-dialog-content] > div > div:first-child {
+  background: transparent !important;
+}
+
+/* Close button */
+[data-radix-dialog-content] button[aria-label="Close"],
+[data-radix-dialog-content] [class*="close"],
+[data-radix-dialog-content] [class*="Close"] {
+  color: #00d4d4 !important;
+  background: rgba(0, 212, 212, 0.1) !important;
+  border-radius: 8px !important;
+  border: none !important;
+}
+
+[data-radix-dialog-content] button[aria-label="Close"]:hover {
+  background: rgba(0, 212, 212, 0.2) !important;
+}
+
+/* Headings and text */
+[data-radix-dialog-content] h1,
+[data-radix-dialog-content] h2,
+[data-radix-dialog-content] h3,
+[data-radix-dialog-content] h4,
+[data-radix-dialog-content] [class*="title"],
+[data-radix-dialog-content] [class*="Title"],
+[data-radix-dialog-content] [class*="heading"],
+[data-radix-dialog-content] [class*="Heading"] {
+  color: #ffffff !important;
+}
+
+[data-radix-dialog-content] p,
+[data-radix-dialog-content] span,
+[data-radix-dialog-content] label,
+[data-radix-dialog-content] [class*="subtitle"],
+[data-radix-dialog-content] [class*="description"],
+[data-radix-dialog-content] [class*="text"] {
+  color: #94a3b8 !important;
+}
+
+/* ============================================
+   Wallet List Items
+   ============================================ */
+
+/* Wallet list container */
+[data-radix-dialog-content] ul,
+[data-radix-dialog-content] [role="listbox"],
+[data-radix-dialog-content] [class*="list"],
+[data-radix-dialog-content] [class*="List"] {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* Individual wallet items */
+[data-radix-dialog-content] li,
+[data-radix-dialog-content] [role="option"],
+[data-radix-dialog-content] button:not([aria-label="Close"]),
+[data-radix-dialog-content] [class*="wallet"],
+[data-radix-dialog-content] [class*="Wallet"],
+[data-radix-dialog-content] [class*="item"],
+[data-radix-dialog-content] [class*="Item"] {
+  background: rgba(0, 212, 212, 0.05) !important;
+  border: 1px solid rgba(0, 212, 212, 0.1) !important;
+  border-radius: 12px !important;
+  color: #e2e8f0 !important;
+  margin: 4px 0 !important;
+  transition: all 0.2s ease !important;
+}
+
+[data-radix-dialog-content] li:hover,
+[data-radix-dialog-content] [role="option"]:hover,
+[data-radix-dialog-content] button:not([aria-label="Close"]):hover,
+[data-radix-dialog-content] [class*="wallet"]:hover,
+[data-radix-dialog-content] [class*="item"]:hover {
+  background: rgba(0, 212, 212, 0.15) !important;
+  border-color: rgba(0, 212, 212, 0.3) !important;
+}
+
+/* Wallet icons */
+[data-radix-dialog-content] img,
+[data-radix-dialog-content] svg {
+  opacity: 1 !important;
+}
+
+/* ============================================
+   Connect Button (in header)
+   ============================================ */
+
+/* Main connect button */
+[data-dapp-kit] button,
+button[class*="connect"],
+button[class*="Connect"],
+[class*="ConnectButton"] button {
+  background: linear-gradient(135deg, #00d4d4 0%, #00a8a8 100%) !important;
+  color: #0a0f1a !important;
+  font-weight: 600 !important;
+  border: none !important;
+  border-radius: 12px !important;
+  padding: 12px 24px !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 15px rgba(0, 212, 212, 0.3) !important;
+}
+
+[data-dapp-kit] button:hover,
+button[class*="connect"]:hover,
+button[class*="Connect"]:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(0, 212, 212, 0.4) !important;
+}
+
+/* Connected state button (shows address) */
+[data-dapp-kit] [data-account-button],
+button[class*="account"],
+button[class*="Account"] {
+  background: rgba(0, 212, 212, 0.1) !important;
+  border: 1px solid rgba(0, 212, 212, 0.3) !important;
+  color: #00d4d4 !important;
+}
+
+/* ============================================
+   Dropdown Menu (when connected)
+   ============================================ */
+
+[data-radix-dropdown-menu-content],
+[role="menu"],
+[class*="dropdown"],
+[class*="Dropdown"] {
+  background: #0d1526 !important;
+  border: 1px solid rgba(0, 212, 212, 0.3) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+}
+
+[role="menuitem"],
+[class*="menuitem"],
+[class*="MenuItem"] {
+  color: #e2e8f0 !important;
+  background: transparent !important;
+}
+
+[role="menuitem"]:hover,
+[class*="menuitem"]:hover {
+  background: rgba(0, 212, 212, 0.15) !important;
+}
+
+/* ============================================
+   Nuclear Option - Override ANY white bg
+   ============================================ */
+
+[data-radix-portal] [style*="background: white"],
+[data-radix-portal] [style*="background-color: white"],
+[data-radix-portal] [style*="background:#fff"],
+[data-radix-portal] [style*="background-color:#fff"],
+[data-radix-portal] [style*="background: rgb(255"],
+[data-radix-portal] [style*="background-color: rgb(255"] {
+  background: #0d1526 !important;
+  background-color: #0d1526 !important;
+}
+
+/* Force dark on anything that looks white */
+[data-radix-portal] *[class*="bg-white"],
+[data-radix-portal] *[class*="bg-gray-"],
+[data-radix-portal] *[class*="bg-slate-"] {
+  background: transparent !important;
+}
